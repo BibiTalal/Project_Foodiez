@@ -4,8 +4,12 @@ import 'package:foodiez/welcome.dart';
 import 'package:go_router/go_router.dart';
 import 'package:foodiez/create_account.dart';
 import 'package:foodiez/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -21,8 +25,8 @@ final router = GoRouter(initialLocation: '/', routes: [
   GoRoute(
     path: '/signin',
     builder: (context, state) => SignedIn(
-      password: state.extra as String,
-    ),
+        // password: state.extra as String,
+        ),
   ),
   GoRoute(
     path: '/welcome',

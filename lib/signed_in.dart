@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:foodiez/home_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:foodiez/reusable/widgets.dart';
 
 class SignedIn extends StatelessWidget {
-  const SignedIn({required this.password, Key? key}) : super(key: key);
-
-  final String password;
+  const SignedIn({Key? key}) : super(key: key);
 
   static const String _title = 'Foodiez';
 
@@ -56,44 +57,32 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                 )),
             Container(
               padding: const EdgeInsets.all(10),
-              child: TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'User Name',
-                ),
-              ),
+              child: reusableTextField("Enter UserName", Icons.person_outline,
+                  false, nameController),
             ),
             Container(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-              child: TextField(
-                obscureText: true,
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Password',
-                ),
-              ),
+              child: reusableTextField("Enter Password", Icons.lock_outline,
+                  true, passwordController),
             ),
-            // TextButton(
-            //   onPressed: () {
-            //     //forgot password screen
-            //   },
-            //   child: const Text(
-            //     'Forgot Password',
-            //   ),
-            // ),
             Container(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: ElevatedButton(
-                  child: const Text('Login'),
-                  onPressed: () {
-                    if (passwordController.text == passwordController.text) {
-                      print("success");
-                      context.go("/welcome", extra: nameController.text);
-                    } else {
-                      print("fail");
-                    }
+                child: firebaseUIButton(
+                  context,
+                  "Sign In",
+                  () {
+                    FirebaseAuth.instance
+                        .signInWithEmailAndPassword(
+                            email: nameController.text,
+                            password: passwordController.text)
+                        .then((value) {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HomeScreen()));
+                    }).onError((error, stackTrace) {
+                      print("Error ${error.toString()}");
+                    });
                   },
                 )),
             Row(

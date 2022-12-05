@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:foodiez/home_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:foodiez/reusable/widgets.dart';
 
 class CreateAccount extends StatelessWidget {
   const CreateAccount({Key? key}) : super(key: key);
@@ -54,40 +57,33 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
                 )),
             Container(
               padding: const EdgeInsets.all(10),
-              child: TextField(
-                obscureText: true,
-                controller: nameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Username',
-                ),
-              ),
+              child: reusableTextField("Enter UserName", Icons.person_outline,
+                  false, nameController),
             ),
             Container(
               padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-              child: TextField(
-                obscureText: true,
-                controller: passwordController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Password',
-                ),
-              ),
+              child: reusableTextField("Enter Password", Icons.lock_outlined,
+                  true, passwordController),
             ),
-            // TextButton(
-            //   onPressed: () {
-            //     //forgot password screen
-            //   },
-            //   child: const Text(
-            //     'Forgot Password',
-            //   ),
-            // ),
             Container(
                 padding: const EdgeInsets.fromLTRB(10, 0, 10, 0),
-                child: ElevatedButton(
-                  child: const Text('Sign Up'),
-                  onPressed: () {
-                    context.go("/signin", extra: passwordController.text);
+                child: firebaseUIButton(
+                  context,
+                  "Sign Up",
+                  () {
+                    FirebaseAuth.instance
+                        .createUserWithEmailAndPassword(
+                            email: nameController.text,
+                            password: passwordController.text)
+                        .then((value) {
+                      print("Created New Account");
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HomeScreen()));
+                    }).onError((error, stackTrace) {
+                      print("Error ${error.toString()}");
+                    });
                   },
                 )),
             Row(
